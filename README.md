@@ -14,6 +14,8 @@ A simple, powerful pattern for caching data
 
 2. Reduce step - group buckets and reduce
 
+Results are cached automatically - no need to precompute values (the exact same method to query can be used to preheat the cache if necessary).
+
 Since the current period is always calculated, **results are real-time**. :boom:
 
 ## Examples
