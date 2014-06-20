@@ -8,9 +8,9 @@ A simple, powerful pattern for caching data
 
 1. Cache step - data is cached in small buckets by time
   - Break time range into small buckets
-  - Read values from cache
-  - Caclulate missing values
-  - Cache new values, except the current period
+  - Get cached values
+  - Caclulate uncached values
+  - Cache uncached values, except the current period
 
 2. Reduce step - group buckets and reduce
 
