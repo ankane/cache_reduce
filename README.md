@@ -131,6 +131,14 @@ Add this line to your application’s Gemfile:
 gem 'cache_reduce'
 ```
 
+## Reference
+
+Force recache [master]
+
+```ruby
+SearchesCount.all(time_range: time_range, recache: true)
+```
+
 ## TODO
 
 - more reducer methods - `by_week`, `by_month`, etc.

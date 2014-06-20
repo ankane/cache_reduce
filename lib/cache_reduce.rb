@@ -60,7 +60,7 @@ module CacheReduce
       key = self.key
       key = key.join("/") if key.is_a?(Array)
       keys = hours.map{|h| [key, "hour", h.to_i].join("/") }
-      values = options[:fresh] ? {} : cache_store.read(keys)
+      values = options[:recache] ? {} : cache_store.read(keys)
 
       # TODO smarter groups
       range_start = nil
