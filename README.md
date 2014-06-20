@@ -14,7 +14,7 @@ A simple, powerful pattern for caching data
 
 2. Reduce step - group buckets and reduce
 
-Since the current period is always calculated, CacheReduce provides real-time results.
+Since the current period is always calculated, **results are real-time**. :boom:
 
 ## Examples
 
