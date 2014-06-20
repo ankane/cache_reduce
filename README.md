@@ -115,8 +115,11 @@ end
 Built-in methods
 
 - all
-- by_day
 - by_hour
+- by_day
+- by_week
+- by_month
+- by_year
 
 Built-in operations
 

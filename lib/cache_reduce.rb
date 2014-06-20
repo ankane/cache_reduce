@@ -7,24 +7,10 @@ module CacheReduce
       reduce(fetch(options).values)
     end
 
-    def by_day(options = {})
-      result = fetch(options)
-      time_range = result.keys.first..result.keys.last
-      days = [time_range.first.beginning_of_day]
-      while day = days.last + 1.day and time_range.cover?(day)
-        days << day
+    %i[hour day week month year].each do |period|
+      define_method "by_#{period}" do |options = {}|
+        by_period(period, options)
       end
-      grouped = result.group_by{|k, v| k.beginning_of_day }
-
-      final = {}
-      days.each do |day|
-        final[day] = reduce((grouped[day] || []).map(&:last))
-      end
-      final
-    end
-
-    def by_hour(options = {})
-      fetch(options)
     end
 
     protected
@@ -65,11 +51,8 @@ module CacheReduce
       # TODO smarter groups
       range_start = nil
       hours.each_with_index do |hour, i|
-        value = values[keys[i]]
-        if !value
-          range_start = hour
-          break
-        end
+        range_start = hour
+        break if !values[keys[i]]
       end
 
       preload(range_start...hours.last + 1.hour)
@@ -82,7 +65,7 @@ module CacheReduce
             values[key]
           else
             v = value(hour...hour + 1.hour)
-            if hour.end_of_hour < Time.now
+            if true # hour.end_of_hour < Time.now
               cache_store.write(key, v)
             end
             v
@@ -90,6 +73,53 @@ module CacheReduce
       end
 
       result
+    end
+
+    # from groupdate
+    def round_time(period, time)
+      time_zone = Time.zone
+      day_start = 0
+      week_start = 6 # sunday
+      time = time.to_time.in_time_zone(time_zone) - day_start.hours
+
+      time =
+        case period
+        when :second
+          time.change(usec: 0)
+        when :minute
+          time.change(sec: 0)
+        when :hour
+          time.change(min: 0)
+        when :day
+          time.beginning_of_day
+        when :week
+          # same logic as MySQL group
+          weekday = (time.wday - 1) % 7
+          (time - ((7 - week_start + weekday) % 7).days).midnight
+        when :month
+          time.beginning_of_month
+        else # year
+          time.beginning_of_year
+        end
+
+      time + day_start.hours
+    end
+
+    def by_period(period, options = {})
+      result = fetch(options)
+      time_range = result.keys.first..result.keys.last
+
+      days = [round_time(period, time_range.first)]
+      while day = days.last + 1.send(period) and time_range.cover?(day)
+        days << day
+      end
+      grouped = result.group_by{|k, v| round_time(period, k) }
+
+      final = {}
+      days.each do |day|
+        final[day] = reduce((grouped[day] || []).map(&:last))
+      end
+      final
     end
 
   end
