@@ -60,7 +60,7 @@ module CacheReduce
             values[key]
           else
             v = value(hour...hour + 1.hour)
-            if true # hour.end_of_hour < Time.now
+            if hour.end_of_hour < Time.now or options[:cache_current]
               cache_store.write(key, v)
             end
             v
