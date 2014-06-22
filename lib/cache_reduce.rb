@@ -35,7 +35,7 @@ module CacheReduce
     end
 
     def fetch(options = {})
-      hours = TimeRange.new(range: options[:time_range]).expand_start(:hour).step(:hour)
+      hours = TimeRange.new(range: options[:time_range]).expand(:hour).step(:hour)
 
       # TODO handle advanced objects as keys
       key = self.key
@@ -77,7 +77,7 @@ module CacheReduce
       grouped = result.group_by{|k, v| TimeRange.bucket(period, k) }
 
       final = {}
-      TimeRange.new(range: time_range).expand_start(:day).step(:day) do |day|
+      TimeRange.new(range: time_range).expand(:day).step(:day) do |day|
         final[day] = reduce((grouped[day] || []).map(&:last))
       end
       final
